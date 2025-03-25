@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}{{ interface.name }} - Application Metadata{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Application Metadata</h1>
+            <p class="lead">{{ interface.name }}</p>
+            <p>This page provides detailed metadata about this MuleSoft application.</p>
+        </div>
+    </div>
+
+    {% if metadata %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Application Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if metadata.application %}
+                    <table class="table table-bordered">
+                        <tbody>
+                            {% if metadata.application.name %}
+                            <tr>
+                                <th scope="row">Name</th>
+                                <td>{{ metadata.application.name }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application.muleVersion %}
+                            <tr>
+                                <th scope="row">Mule Version</th>
+                                <td>{{ metadata.application.muleVersion }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application.product %}
+                            <tr>
+                                <th scope="row">Required Product</th>
+                                <td>{{ metadata.application.product }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application['Build-Date-Formatted'] %}
+                            <tr>
+                                <th scope="row">Build Date</th>
+                                <td>{{ metadata.application['Build-Date-Formatted'] }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application['Manifest-Version'] %}
+                            <tr>
+                                <th scope="row">Manifest Version</th>
+                                <td>{{ metadata.application['Manifest-Version'] }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application['Implementation-Title'] %}
+                            <tr>
+                                <th scope="row">Implementation Title</th>
+                                <td>{{ metadata.application['Implementation-Title'] }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application['Implementation-Version'] %}
+                            <tr>
+                                <th scope="row">Implementation Version</th>
+                                <td>{{ metadata.application['Implementation-Version'] }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application.classLoaderType %}
+                            <tr>
+                                <th scope="row">ClassLoader Type</th>
+                                <td>{{ metadata.application.classLoaderType }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application.bundleType %}
+                            <tr>
+                                <th scope="row">Bundle Type</th>
+                                <td>{{ metadata.application.bundleType }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.application.configFiles %}
+                            <tr>
+                                <th scope="row">Configuration Files</th>
+                                <td>
+                                    <ul class="list-unstyled mb-0">
+                                        {% for config in metadata.application.configFiles %}
+                                        <li><code>{{ config }}</code></li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No application information available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Maven Project Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if metadata.maven %}
+                    <table class="table table-bordered">
+                        <tbody>
+                            {% if metadata.maven.groupId %}
+                            <tr>
+                                <th scope="row">Group ID</th>
+                                <td>{{ metadata.maven.groupId }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.maven.artifactId %}
+                            <tr>
+                                <th scope="row">Artifact ID</th>
+                                <td>{{ metadata.maven.artifactId }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.maven.version %}
+                            <tr>
+                                <th scope="row">Version</th>
+                                <td>{{ metadata.maven.version }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.maven.name %}
+                            <tr>
+                                <th scope="row">Name</th>
+                                <td>{{ metadata.maven.name }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.maven.description %}
+                            <tr>
+                                <th scope="row">Description</th>
+                                <td>{{ metadata.maven.description }}</td>
+                            </tr>
+                            {% endif %}
+                            
+                            {% if metadata.maven.parent %}
+                            <tr>
+                                <th scope="row">Parent POM</th>
+                                <td>
+                                    <code>{{ metadata.maven.parent.groupId }}:{{ metadata.maven.parent.artifactId }}:{{ metadata.maven.parent.version }}</code>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No Maven project information available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Build Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if metadata.build_info %}
+                    <table class="table table-bordered">
+                        <tbody>
+                            {% for key, value in metadata.build_info.items() %}
+                            <tr>
+                                <th scope="row">{{ key }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No build information available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Dependencies</h5>
+                        <div>
+                            <div class="input-group">
+                                <input type="text" id="dependencySearch" class="form-control form-control-sm" placeholder="Search dependencies...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if metadata.dependencies %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="dependenciesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Group ID</th>
+                                    <th>Artifact ID</th>
+                                    <th>Version</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dep in metadata.dependencies %}
+                                <tr class="dependency-item" data-dep-id="{{ dep.groupId }}:{{ dep.artifactId }}">
+                                    <td>{{ dep.groupId }}</td>
+                                    <td>{{ dep.artifactId }}</td>
+                                    <td>{{ dep.version }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No dependency information available.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if metadata.mule and metadata.mule.plugin %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Mule Plugin Information</h5>
+                </div>
+                <div class="card-body">
+                    <pre><code>{{ metadata.mule.plugin|tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if metadata.application.secureProperties %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Secure Properties</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prop in metadata.application.secureProperties %}
+                                <tr>
+                                    <td><code>{{ prop }}</code></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No Metadata Information Found</h4>
+        <p>No metadata information could be extracted from this MuleSoft application.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality for dependencies
+    const searchInput = document.getElementById('dependencySearch');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const items = document.querySelectorAll('.dependency-item');
+            
+            items.forEach(item => {
+                const depId = item.getAttribute('data-dep-id').toLowerCase();
+                if (depId.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

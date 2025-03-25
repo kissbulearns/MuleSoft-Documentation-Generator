@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}{{ interface.name }} - Documentation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>{{ interface.name }}</h1>
+            <p class="lead">MuleSoft Application Documentation</p>
+            <p>This documentation provides detailed information about the structure, components, and configuration of this MuleSoft application.</p>
+        </div>
+    </div>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <!-- Flows -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-diagram-3"></i> Flows</h5>
+                    <p class="card-text">View all flows and their detailed information including processors, sources, and targets.</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flowsList" aria-expanded="false" aria-controls="flowsList">
+                        Show Flows ({{ interface.flows|length }})
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flow Visualization -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-bounding-box"></i> Flow Visualization</h5>
+                    <p class="card-text">Visual representation of flows and their relationships within the application.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="flow_diagram.html" class="btn btn-primary">View Diagram</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Environment Configurations -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-gear"></i> Environment Configurations</h5>
+                    <p class="card-text">View and compare configuration properties across different environments.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="configurations.html" class="btn btn-primary">View Configurations</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DataWeave Transformations -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-code-square"></i> DataWeave Transformations</h5>
+                    <p class="card-text">Explore data transformations used throughout the application.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="dataweave.html" class="btn btn-primary">View Transformations</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Handling -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-exclamation-triangle"></i> Error Handling</h5>
+                    <p class="card-text">Documentation of error handling strategies across flows.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="error_handling.html" class="btn btn-primary">View Error Handling</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Application Metadata -->
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-info-circle"></i> Application Metadata</h5>
+                    <p class="card-text">View detailed metadata about the application including dependencies and build info.</p>
+                </div>
+                <div class="card-footer">
+                    <a href="metadata.html" class="btn btn-primary">View Metadata</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="collapse mb-5" id="flowsList">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">All Flows</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Flow Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for flow in interface.flows %}
+                            <tr>
+                                <td>{{ flow.id }}</td>
+                                <td>
+                                    {% if flow.is_subflow %}
+                                    <span class="badge bg-info">Subflow</span>
+                                    {% elif flow.source %}
+                                    <span class="badge bg-success">Source</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Flow</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ flow.description or "No description" }}</td>
+                                <td>
+                                    <a href="flows/flow_{{ interface.name.lower().replace(' ', '_') }}_{{ flow.id.lower().replace(' ', '_') }}.html" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Interface Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Flow Statistics</h6>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th>Total Flows</th>
+                                        <td>{{ interface.flows|length }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Subflows</th>
+                                        <td>{{ interface.get_subflows()|length }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Source Flows</th>
+                                        <td>{{ interface.source_flows|length }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Source Types</h6>
+                            <div>
+                                {% set source_types = {} %}
+                                {% for flow in interface.source_flows %}
+                                    {% set source_type = flow.source.get('type', 'unknown') %}
+                                    {% if source_type in source_types %}
+                                        {% set _ = source_types.update({source_type: source_types[source_type] + 1}) %}
+                                    {% else %}
+                                        {% set _ = source_types.update({source_type: 1}) %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% for type, count in source_types.items() %}
+                                <span class="badge bg-secondary me-2 mb-2">{{ type }} ({{ count }})</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

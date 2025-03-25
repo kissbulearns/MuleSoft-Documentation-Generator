@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}DataWeave Transformations - {{ interface.name }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .dataweave-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .transformation-details {
+        font-size: 0.9rem;
+    }
+    
+    .complexity-indicator {
+        width: 100%;
+        height: 6px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    
+    .complexity-bar {
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .complexity-low {
+        background-color: var(--mule-secondary);
+    }
+    
+    .complexity-medium {
+        background-color: var(--mule-primary);
+    }
+    
+    .complexity-high {
+        background-color: var(--mule-warning);
+    }
+    
+    .complexity-very-high {
+        background-color: var(--mule-error);
+    }
+    
+    .code-preview {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .dataweave-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .dataweave-meta-item {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        background-color: rgba(0,0,0,0.05);
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>DataWeave Transformations</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Transformation Statistics</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Total transformations:</strong> {{ transformations|length }}</p>
+                    <p><strong>Average complexity:</strong> 
+                    {% if transformations %}
+                        {% set total_complexity = 0 %}
+                        {% for t in transformations %}
+                            {% if t is mapping and t.complexity is defined %}
+                                {% set total_complexity = total_complexity + t.complexity %}
+                            {% endif %}
+                        {% endfor %}
+                        {{ (total_complexity / transformations|length)|round(2) }}
+                    {% else %}
+                        0
+                    {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>DataWeave versions:</strong> 
+                    {% set versions = [] %}
+                    {% for t in transformations %}
+                        {% if t is mapping and t.version is defined and t.version not in versions %}
+                            {% set versions = versions + [t.version] %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ versions|join(', ') or 'Unknown' }}
+                    </p>
+                    <p><strong>Output types:</strong> 
+                    {% set output_types = [] %}
+                    {% for t in transformations %}
+                        {% if t is mapping and t.output_type is defined and t.output_type not in output_types %}
+                            {% set output_types = output_types + [t.output_type] %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ output_types|join(', ') or 'Unknown' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search transformations...">
+    </div>
+    
+    <div id="transformationsList">
+        {% for transformation in transformations %}
+        <div class="card mb-3 transformation-card">
+            <div class="card-header" id="heading{{ loop.index }}">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                        Transformation #{{ loop.index }} - {{ transformation.file_path.split('/')[-1] if transformation.file_path else 'Embedded' }}
+                        <span class="badge bg-info float-end">{{ transformation.output_type }}</span>
+                    </button>
+                </h2>
+            </div>
+            
+            <div id="collapse{{ loop.index }}" class="collapse" aria-labelledby="heading{{ loop.index }}">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Version:</strong> {{ transformation.version }}</p>
+                            <p><strong>Output Type:</strong> {{ transformation.output_type }}</p>
+                            <p><strong>Complexity:</strong> {{ transformation.complexity }}</p>
+                            
+                            {% if transformation.input_types %}
+                            <h5>Input Types:</h5>
+                            <ul>
+                                {% for var_name, var_type in transformation.input_types.items() %}
+                                <li><strong>{{ var_name }}</strong>: {{ var_type }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            {% if transformation.variables %}
+                            <h5>Variables:</h5>
+                            <ul>
+                                {% for variable in transformation.variables %}
+                                <li>{{ variable }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            {% if transformation.functions %}
+                            <h5>Functions:</h5>
+                            <ul>
+                                {% for function in transformation.functions %}
+                                <li>{{ function }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if transformation.mapping_sample %}
+                            <h5>Sample Mapping:</h5>
+                            <pre class="p-2 bg-light"><code>{{ transformation.mapping_sample }}</code></pre>
+                            {% endif %}
+                            
+                            {% if transformation.code_preview %}
+                            <h5>Code Preview:</h5>
+                            <pre class="p-2 bg-light"><code>{{ transformation.code_preview }}</code></pre>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const transformationCards = document.querySelectorAll('.transformation-card');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            transformationCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %} 

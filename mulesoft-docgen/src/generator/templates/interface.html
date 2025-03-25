@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ interface.name }} - MuleSoft Interface Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>{{ interface.name }}</h1>
+        <p class="breadcrumb"><a href="index.html">Home</a> &gt; {{ interface.name }}</p>
+    </header>
+    
+    <main>
+        <section class="interface-overview">
+            <h2>Interface Overview</h2>
+            <p>{{ interface.description or 'No description available.' }}</p>
+            
+            <div class="interface-details">
+                <div class="detail-item">
+                    <h3>Purpose</h3>
+                    <p>{{ interface.infer_purpose() }}</p>
+                </div>
+                
+                <div class="detail-item">
+                    <h3>Flows</h3>
+                    <p>Total: {{ interface.flows|length }}</p>
+                    <p>Source Flows: {{ interface.source_flows|length }}</p>
+                    <p>Sub-flows: {{ interface.subflows|length }}</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="global-configs">
+            <h2>Global Configurations</h2>
+            {% if interface.global_configs %}
+                <table class="configs-table">
+                    <thead>
+                        <tr>
+                            <th>Configuration Name</th>
+                            <th>Type</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for name, config in interface.global_configs.items() %}
+                        <tr>
+                            <td>{{ name }}</td>
+                            <td>{{ config.get('type', 'Unknown') }}</td>
+                            <td>
+                                {% if config.get('type') == 'file-config' %}
+                                    File configuration
+                                {% elif config.get('type') == 'sftp-config' %}
+                                    SFTP connection to {{ config.get('connection', {}).get('host', 'unknown host') }}
+                                {% elif config.get('type') == 'http-listener-config' %}
+                                    HTTP listener on {{ config.get('host', 'unknown host') }}:{{ config.get('port', 'unknown port') }}
+                                {% else %}
+                                    {{ config }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No global configurations found.</p>
+            {% endif %}
+        </section>
+        
+        <section class="source-flows">
+            <h2>Source Flows</h2>
+            {% if interface.source_flows %}
+                <table class="flows-table">
+                    <thead>
+                        <tr>
+                            <th>Flow Name</th>
+                            <th>Source Type</th>
+                            <th>Details</th>
+                            <th>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flow in interface.source_flows %}
+                        <tr>
+                            <td><a href="flow_{{ interface.name.lower().replace(' ', '_') }}_{{ flow.id.lower().replace(' ', '_') }}.html">{{ flow.id }}</a></td>
+                            <td>{{ flow.source.get('type', 'Unknown') }}</td>
+                            <td>
+                                {% if flow.source.get('type') == 'file-listener' %}
+                                    Directory: {{ flow.source.get('directory', 'Not specified') }}<br>
+                                    Pattern: {{ flow.source.get('pattern', 'Not specified') }}
+                                {% elif flow.source.get('type') == 'sftp-listener' %}
+                                    Directory: {{ flow.source.get('directory', 'Not specified') }}<br>
+                                    Pattern: {{ flow.source.get('pattern', 'Not specified') }}
+                                {% elif flow.source.get('type') == 'http-listener' %}
+                                    Path: {{ flow.source.get('path', 'Not specified') }}<br>
+                                    Method: {{ flow.source.get('method', 'All methods') }}
+                                {% elif flow.source.get('type') == 'scheduler' %}
+                                    Frequency: {{ flow.source.get('frequency', 'Not specified') }}
+                                {% else %}
+                                    {{ flow.source }}
+                                {% endif %}
+                            </td>
+                            <td>{{ flow.file_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No source flows found.</p>
+            {% endif %}
+        </section>
+        
+        <section class="sub-flows">
+            <h2>Sub-flows</h2>
+            {% if interface.subflows %}
+                <table class="flows-table">
+                    <thead>
+                        <tr>
+                            <th>Sub-flow Name</th>
+                            <th>Description</th>
+                            <th>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flow in interface.subflows %}
+                        <tr>
+                            <td><a href="flow_{{ interface.name.lower().replace(' ', '_') }}_{{ flow.id.lower().replace(' ', '_') }}.html">{{ flow.id }}</a></td>
+                            <td>{{ flow.description }}</td>
+                            <td>{{ flow.file_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No sub-flows found.</p>
+            {% endif %}
+        </section>
+    </main>
+    
+    <footer>
+        <p>Generated with MuleSoft Documentation Generator</p>
+    </footer>
+</body>
+</html>

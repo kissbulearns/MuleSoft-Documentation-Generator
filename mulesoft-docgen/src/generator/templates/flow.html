@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}{{ flow|get_attr('name', 'Unnamed Flow') }} - {{ interface.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+            <li class="breadcrumb-item active">{{ flow|get_attr('name', 'Unnamed Flow') }}</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h1>{{ flow|get_attr('name', 'Unnamed Flow') }}</h1>
+            <span class="badge badge-primary">{{ flow|get_attr('type', 'Flow') }}</span>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID:</strong> {{ flow|get_attr('id', 'Unknown') }}</p>
+                    <p><strong>Type:</strong> {{ flow|get_attr('type', 'Flow') }}</p>
+                    {% if flow|get_attr('description') %}
+                    <p><strong>Description:</strong> {{ flow|get_attr('description') }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Error Handler:</strong> {{ "Yes" if flow|get_attr('has_error_handler') else "No" }}</p>
+                    <p><strong>Referenced By:</strong> {{ flow|get_attr('referenced_by', [])|length }} flows</p>
+                    <p><strong>References:</strong> {{ flow|get_attr('references', [])|length }} flows</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if flow|get_attr('source') %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Source</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Type:</strong> {{ flow|get_attr('source.type', 'Unknown') }}</p>
+            {% set attrs = flow|get_attr('source.attributes', {}) %}
+            {% if attrs %}
+            <p><strong>Attributes:</strong></p>
+            <ul>
+                {% for key, value in attrs.items() %}
+                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if flow|get_attr('processors') and flow|get_attr('processors')|length > 0 %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Processors</h2>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                {% for processor in flow|get_attr('processors', []) %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>{{ processor|get_attr('type', 'Unknown Processor') }}</h5>
+                        {% if processor|get_attr('name') %}
+                        <span class="badge badge-secondary">{{ processor|get_attr('name') }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% set attrs = processor|get_attr('attributes', {}) %}
+                    {% if attrs %}
+                    <div class="mt-2">
+                        <p><strong>Attributes:</strong></p>
+                        <ul>
+                            {% for key, value in attrs.items() %}
+                            <li><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    {% if processor|get_attr('config_ref') %}
+                    <p><strong>Config Reference:</strong> {{ processor|get_attr('config_ref') }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if flow|get_attr('error_handler') %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Error Handler</h2>
+        </div>
+        <div class="card-body">
+            {% set handlers = flow|get_attr('error_handler.handlers', []) %}
+            {% if handlers %}
+            <div class="list-group">
+                {% for handler in handlers %}
+                <div class="list-group-item">
+                    <h5>{{ handler|get_attr('type', 'Unknown Handler') }}</h5>
+                    
+                    {% if handler|get_attr('when') %}
+                    <p><strong>When:</strong> {{ handler|get_attr('when') }}</p>
+                    {% endif %}
+                    
+                    {% set processors = handler|get_attr('processors', []) %}
+                    {% if processors %}
+                    <p><strong>Processors:</strong></p>
+                    <ul>
+                        {% for processor in processors %}
+                        <li>{{ processor|get_attr('type', 'Unknown Processor') }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No specific error handlers defined.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if flow|get_attr('referenced_by') and flow|get_attr('referenced_by')|length > 0 %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Referenced By</h2>
+        </div>
+        <div class="card-body">
+            <ul>
+                {% for ref in flow|get_attr('referenced_by', []) %}
+                <li>
+                    <a href="flow_{{ interface.name|lower|replace(' ', '_') }}_{{ ref|lower|replace(' ', '_') }}.html">
+                        {{ ref }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if flow|get_attr('references') and flow|get_attr('references')|length > 0 %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>References</h2>
+        </div>
+        <div class="card-body">
+            <ul>
+                {% for ref in flow|get_attr('references', []) %}
+                <li>
+                    <a href="flow_{{ interface.name|lower|replace(' ', '_') }}_{{ ref|lower|replace(' ', '_') }}.html">
+                        {{ ref }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flow Diagrams - Simple Test Flow</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+    
+    <!-- jQuery (needed for Bootstrap features) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Additional head content -->
+    
+<!-- Mermaid JS -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+<style>
+    .diagram-container {
+        overflow: auto;
+        max-width: 100%;
+        background-color: white;
+        padding: 10px;
+        border-radius: 4px;
+    }
+    
+    .controls {
+        margin-bottom: 15px;
+        text-align: right;
+    }
+    
+    .mermaid svg {
+        max-width: 100%;
+    }
+    
+    #mermaidSource {
+        display: none;
+        white-space: pre;
+        overflow: auto;
+        max-height: 300px;
+    }
+</style>
+
+    
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        
+        .navbar {
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            font-size: 85%;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .code-block {
+            margin-bottom: 15px;
+        }
+        
+        /* Ensure mermaid diagrams are visible */
+        .mermaid {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">MuleSoft Documentation</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="configurations.html">Configurations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dataweave.html">DataWeave</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="flow_diagram.html">Flow Diagrams</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="error_handling.html">Error Handling</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="metadata.html">Metadata</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+<div class="container mt-4">
+    <h1>Flow Diagram</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Flow Relationships</h5>
+                <div class="controls">
+                    <button class="btn btn-sm btn-outline-secondary" id="zoomIn">Zoom In</button>
+                    <button class="btn btn-sm btn-outline-secondary" id="zoomOut">Zoom Out</button>
+                    <button class="btn btn-sm btn-outline-primary" id="resetZoom">Reset</button>
+                    <button class="btn btn-sm btn-outline-info" id="toggleSource">Show Source</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="diagram-container">
+                <div id="mermaidGraph" class="mermaid">
+graph TD
+                </div>
+            </div>
+            <div id="mermaidSource" class="mt-3 bg-light p-3 rounded">
+                <pre><code>graph TD</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    
+</div>
+
+    
+    <footer class="container">
+        <p class="text-center text-muted">&copy; Generated with MuleSoft Documentation Generator</p>
+    </footer>
+    
+    <!-- Always ensure mermaid is properly loaded on every page for consistency -->
+    <script>
+        // Detect if page includes mermaid content
+        if (document.querySelector('.mermaid')) {
+            console.log('Mermaid content detected on page');
+        }
+    </script>
+    
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Basic configuration with minimal options
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default'
+        });
+        
+        // Toggle source code view
+        document.getElementById('toggleSource').addEventListener('click', function() {
+            const sourceElement = document.getElementById('mermaidSource');
+            if (sourceElement.style.display === 'none' || !sourceElement.style.display) {
+                sourceElement.style.display = 'block';
+                this.textContent = 'Hide Source';
+            } else {
+                sourceElement.style.display = 'none';
+                this.textContent = 'Show Source';
+            }
+        });
+        
+        // Set up zoom controls
+        setTimeout(function() {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                console.log('Mermaid diagram rendered successfully');
+                
+                let currentZoom = 1;
+                document.getElementById('zoomIn').addEventListener('click', function() {
+                    currentZoom += 0.1;
+                    svg.style.transform = `scale(${currentZoom})`;
+                    svg.style.transformOrigin = 'top left';
+                });
+                
+                document.getElementById('zoomOut').addEventListener('click', function() {
+                    currentZoom = Math.max(0.1, currentZoom - 0.1);
+                    svg.style.transform = `scale(${currentZoom})`;
+                    svg.style.transformOrigin = 'top left';
+                });
+                
+                document.getElementById('resetZoom').addEventListener('click', function() {
+                    currentZoom = 1;
+                    svg.style.transform = 'scale(1)';
+                });
+            } else {
+                console.warn('Mermaid diagram failed to render');
+                document.getElementById('mermaidGraph').innerHTML = 
+                    '<div class="alert alert-warning">Unable to render the flow diagram. See the source below for details.</div>';
+                document.getElementById('mermaidSource').style.display = 'block';
+                document.getElementById('toggleSource').textContent = 'Hide Source';
+            }
+        }, 1000);
+    });
+</script>
+
+</body>
+</html> 

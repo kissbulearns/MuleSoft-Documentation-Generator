@@ -1,0 +1,225 @@
+/* MuleSoft Documentation Generator Styles */
+
+/* Custom Colors */
+:root {
+  --mule-primary: #00A1DF;
+  --mule-secondary: #00C98D;
+  --mule-tertiary: #765EA6;
+  --mule-dark: #414042;
+  --mule-light: #F5F7F9;
+  --mule-warning: #F8B500;
+  --mule-error: #EB5757;
+}
+
+/* Base Styles */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--mule-dark);
+  background-color: var(--mule-light);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--mule-primary);
+}
+
+a:hover {
+  color: var(--mule-tertiary);
+}
+
+.btn-primary {
+  background-color: var(--mule-primary);
+  border-color: var(--mule-primary);
+}
+
+.btn-primary:hover {
+  background-color: #0082b3;
+  border-color: #0082b3;
+}
+
+.btn-outline-primary {
+  color: var(--mule-primary);
+  border-color: var(--mule-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--mule-primary);
+  border-color: var(--mule-primary);
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 600;
+}
+
+.navbar {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Cards */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Tables */
+.table {
+  background-color: white;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0,161,223,0.05);
+}
+
+/* Badges */
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.7em;
+  border-radius: 4px;
+}
+
+.badge.bg-info {
+  background-color: var(--mule-tertiary) !important;
+}
+
+.badge.bg-success {
+  background-color: var(--mule-secondary) !important;
+}
+
+/* Flows and Components */
+.flow-component {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-left: 4px solid var(--mule-primary);
+}
+
+.flow-component.source {
+  border-left-color: var(--mule-secondary);
+}
+
+.flow-component.error-handler {
+  border-left-color: var(--mule-error);
+}
+
+.flow-component.processor {
+  border-left-color: var(--mule-tertiary);
+}
+
+/* Code Blocks */
+pre {
+  background-color: #222;
+  color: #f8f8f2;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+
+/* Flow Visualization */
+.flow-diagram {
+  width: 100%;
+  height: auto;
+  min-height: 500px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 1rem;
+}
+
+/* Config Comparison */
+.config-diff {
+  background-color: rgba(248, 181, 0, 0.1);
+}
+
+.config-diff-added {
+  background-color: rgba(0, 201, 141, 0.1);
+}
+
+.config-diff-removed {
+  background-color: rgba(235, 87, 87, 0.1);
+}
+
+/* Environment Pills */
+.env-pill {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.env-pill.prod {
+  background-color: var(--mule-secondary);
+  color: white;
+}
+
+.env-pill.uat {
+  background-color: var(--mule-tertiary);
+  color: white;
+}
+
+.env-pill.dev {
+  background-color: var(--mule-primary);
+  color: white;
+}
+
+/* Search and Filters */
+.search-box {
+  margin-bottom: 1.5rem;
+}
+
+/* DataWeave Syntax Highlighting */
+.dataweave-code .keyword {
+  color: #f92672;
+}
+.dataweave-code .string {
+  color: #a6e22e;
+}
+.dataweave-code .function {
+  color: #66d9ef;
+}
+.dataweave-code .variable {
+  color: #fd971f;
+}
+.dataweave-code .comment {
+  color: #75715e;
+}
+.dataweave-code .number {
+  color: #ae81ff;
+}
+
+/* Error Handling */
+.error-strategy {
+  border-left: 4px solid var(--mule-error);
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+} 

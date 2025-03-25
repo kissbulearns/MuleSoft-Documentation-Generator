@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Environment Configurations - {{ interface.name }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .config-table th {
+        position: sticky;
+        top: 0;
+        background-color: white;
+    }
+    
+    .config-property {
+        font-family: 'Fira Code', monospace;
+    }
+
+    .sensitive-value {
+        font-style: italic;
+        color: #999;
+    }
+    
+    .filter-container {
+        margin-bottom: 1rem;
+    }
+    
+    .config-category {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .config-category h5 {
+        margin-bottom: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Environment Configurations</h1>
+            <p class="lead">This page displays the configuration properties for all environments used with the {{ interface.name }} application.</p>
+        </div>
+    </div>
+
+    {% if configs %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Available Environments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for env_name in configs.keys() %}
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="card h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        <span class="env-pill {{ env_name.lower() }}">{{ env_name }}</span>
+                                    </h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">{{ configs[env_name]['properties']|length }} configuration properties</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Configuration Properties</h5>
+                    <div class="filter-container">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="propertyFilter" placeholder="Filter properties...">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs mb-3" id="configTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All Properties</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="differences-tab" data-bs-toggle="tab" data-bs-target="#differences" type="button" role="tab" aria-controls="differences" aria-selected="false">
+                                Environment Differences
+                                {% if config_diffs %}
+                                <span class="badge bg-warning rounded-pill ms-1">{{ config_diffs|length }}</span>
+                                {% endif %}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="connections-tab" data-bs-toggle="tab" data-bs-target="#connections" type="button" role="tab" aria-controls="connections" aria-selected="false">Connections</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="credentials-tab" data-bs-toggle="tab" data-bs-target="#credentials" type="button" role="tab" aria-controls="credentials" aria-selected="false">Credentials</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="configTabsContent">
+                        <!-- All Properties Tab -->
+                        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover config-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Property</th>
+                                            {% for env_name in configs.keys() %}
+                                            <th>{{ env_name }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody class="property-list">
+                                        {% for property in all_properties %}
+                                        <tr>
+                                            <td class="config-property">{{ property }}</td>
+                                            {% for env_name in configs.keys() %}
+                                            <td>
+                                                {% if property in configs[env_name]['properties'] %}
+                                                {% if configs[env_name]['properties'][property] is mapping %}
+                                                <pre>{{ configs[env_name]['properties'][property]|tojson(indent=2) }}</pre>
+                                                {% elif 'password' in property.lower() or 'secret' in property.lower() or 'key' in property.lower() %}
+                                                <span class="sensitive-value">*****</span>
+                                                {% else %}
+                                                {{ configs[env_name]['properties'][property] }}
+                                                {% endif %}
+                                                {% else %}
+                                                <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Differences Tab -->
+                        <div class="tab-pane fade" id="differences" role="tabpanel" aria-labelledby="differences-tab">
+                            {% if config_diffs %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> 
+                                Showing {{ config_diffs|length }} properties with differences across environments.
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover config-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Property</th>
+                                            {% for env_name in configs.keys() %}
+                                            <th>{{ env_name }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody class="property-list">
+                                        {% for property in config_diffs %}
+                                        <tr class="config-diff">
+                                            <td class="config-property">{{ property }}</td>
+                                            {% for env_name in configs.keys() %}
+                                            <td>
+                                                {% if property in configs[env_name]['properties'] %}
+                                                {% if configs[env_name]['properties'][property] is mapping %}
+                                                <pre>{{ configs[env_name]['properties'][property]|tojson(indent=2) }}</pre>
+                                                {% elif 'password' in property.lower() or 'secret' in property.lower() or 'key' in property.lower() %}
+                                                <span class="sensitive-value">*****</span>
+                                                {% else %}
+                                                {{ configs[env_name]['properties'][property] }}
+                                                {% endif %}
+                                                {% else %}
+                                                <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i> 
+                                All environment configurations are identical.
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Connections Tab -->
+                        <div class="tab-pane fade" id="connections" role="tabpanel" aria-labelledby="connections-tab">
+                            {% for env_name, env_config in configs.items() %}
+                            {% if env_config.get('connections') %}
+                            <div class="config-category">
+                                <h5>
+                                    <span class="env-pill {{ env_name.lower() }}">{{ env_name }}</span>
+                                    Connections
+                                </h5>
+                                
+                                <div class="list-group">
+                                    {% for conn_name, conn_details in env_config['connections'].items() %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ conn_name }}</h6>
+                                            <small class="text-muted">{{ conn_details.get('type', '') }}</small>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for key, value in conn_details.items() %}
+                                            {% if key != 'type' %}
+                                            <li>
+                                                <small>
+                                                    <strong>{{ key }}:</strong> 
+                                                    {% if 'password' in key.lower() or 'secret' in key.lower() or 'key' in key.lower() %}
+                                                    <span class="sensitive-value">*****</span>
+                                                    {% else %}
+                                                    {{ value }}
+                                                    {% endif %}
+                                                </small>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if not configs %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                No connection configurations found.
+                            </div>
+                            {% else %}
+                                {% set has_connections = false %}
+                                {% for env_name, env_config in configs.items() %}
+                                    {% if env_config.get('connections') %}
+                                        {% set has_connections = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if not has_connections %}
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> 
+                                    No connection configurations found.
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Credentials Tab -->
+                        <div class="tab-pane fade" id="credentials" role="tabpanel" aria-labelledby="credentials-tab">
+                            {% for env_name, env_config in configs.items() %}
+                            {% if env_config.get('credentials') %}
+                            <div class="config-category">
+                                <h5>
+                                    <span class="env-pill {{ env_name.lower() }}">{{ env_name }}</span>
+                                    Credentials
+                                </h5>
+                                
+                                <div class="list-group">
+                                    {% for cred_name, cred_details in env_config['credentials'].items() %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ cred_name }}</h6>
+                                        </div>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for key, value in cred_details.items() %}
+                                            <li>
+                                                <small>
+                                                    <strong>{{ key }}:</strong> 
+                                                    {% if 'password' in key.lower() or 'secret' in key.lower() or 'key' in key.lower() or key == 'value' %}
+                                                    <span class="sensitive-value">*****</span>
+                                                    {% else %}
+                                                    {{ value }}
+                                                    {% endif %}
+                                                </small>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if not configs %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                No credential configurations found.
+                            </div>
+                            {% else %}
+                                {% set has_credentials = false %}
+                                {% for env_name, env_config in configs.items() %}
+                                    {% if env_config.get('credentials') %}
+                                        {% set has_credentials = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if not has_credentials %}
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> 
+                                    No credential configurations found.
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        No configuration files found. The application might be using hardcoded configurations or a different configuration mechanism.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Property filter functionality
+    document.getElementById('propertyFilter').addEventListener('keyup', function() {
+        const filterValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.property-list tr');
+        
+        rows.forEach(row => {
+            const propertyName = row.querySelector('td').textContent.toLowerCase();
+            if (propertyName.includes(filterValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %} 

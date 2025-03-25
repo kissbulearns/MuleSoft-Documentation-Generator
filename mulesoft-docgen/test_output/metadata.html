@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test Flow - Application Metadata</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+    
+    <!-- jQuery (needed for Bootstrap features) -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Additional head content -->
+    
+    
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        
+        .navbar {
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            font-size: 85%;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .code-block {
+            margin-bottom: 15px;
+        }
+        
+        /* Ensure mermaid diagrams are visible */
+        .mermaid {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">MuleSoft Documentation</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="configurations.html">Configurations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dataweave.html">DataWeave</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="flow_diagram.html">Flow Diagrams</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="error_handling.html">Error Handling</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="metadata.html">Metadata</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Application Metadata</h1>
+            <p class="lead">Simple Test Flow</p>
+            <p>This page provides detailed metadata about this MuleSoft application.</p>
+        </div>
+    </div>
+
+    
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No Metadata Information Found</h4>
+        <p>No metadata information could be extracted from this MuleSoft application.</p>
+    </div>
+    
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality for dependencies
+    const searchInput = document.getElementById('dependencySearch');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const items = document.querySelectorAll('.dependency-item');
+            
+            items.forEach(item => {
+                const depId = item.getAttribute('data-dep-id').toLowerCase();
+                if (depId.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+
+    
+    <footer class="container">
+        <p class="text-center text-muted">&copy; Generated with MuleSoft Documentation Generator</p>
+    </footer>
+    
+    <!-- Always ensure mermaid is properly loaded on every page for consistency -->
+    <script>
+        // Detect if page includes mermaid content
+        if (document.querySelector('.mermaid')) {
+            console.log('Mermaid content detected on page');
+        }
+    </script>
+    
+    
+</body>
+</html> 

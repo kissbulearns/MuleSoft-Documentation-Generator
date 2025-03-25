@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}{{ interface.name }} - Flow Visualization{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+<style>
+  .diagram-container {
+    background-color: white;
+    overflow: auto;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 30px;
+  }
+  .mermaid {
+    padding: 20px;
+  }
+  /* Add this to improve diagram visibility */
+  svg {
+    max-width: 100%;
+  }
+  /* Error message styling */
+  .mermaid-error {
+    padding: 15px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 4px;
+    margin-top: 10px;
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Flow Visualization</h1>
+      <p class="lead">{{ interface.name }}</p>
+      <p>This page provides visual representations of the flows and their relationships within this MuleSoft interface.</p>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Flow Diagram</h5>
+        </div>
+        <div class="card-body">
+          <div class="controls">
+            <div class="d-flex justify-content-end mb-2">
+              <button id="zoomInMermaid" class="btn btn-sm btn-outline-secondary me-2">Zoom In</button>
+              <button id="zoomOutMermaid" class="btn btn-sm btn-outline-secondary me-2">Zoom Out</button>
+              <button id="resetZoomMermaid" class="btn btn-sm btn-outline-secondary">Reset</button>
+            </div>
+          </div>
+          
+          <div class="diagram-container">
+            <div class="mermaid" id="mermaidDiagram">
+{{ mermaid_diagram }}
+            </div>
+            <div id="mermaidError" class="mermaid-error">
+              There was an error rendering the flow diagram. The diagram syntax may be incorrect.
+              <pre id="mermaidErrorDetails"></pre>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <h5>Legend</h5>
+            <div class="row">
+              <div class="col-md-3 col-sm-6">
+                <div class="d-flex align-items-center mb-2">
+                  <div style="width: 20px; height: 20px; background-color: #aaaaff; border: 1px solid #000066; margin-right: 10px;"></div>
+                  <span>Standard Flow</span>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="d-flex align-items-center mb-2">
+                  <div style="width: 20px; height: 20px; background-color: #ffaaaa; border: 1px solid #660000; margin-right: 10px;"></div>
+                  <span>Subflow</span>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="d-flex align-items-center mb-2">
+                  <div style="width: 20px; height: 20px; background-color: #aaffaa; border: 1px solid #006600; margin-right: 10px;"></div>
+                  <span>Source Flow</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Flow Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 col-sm-6">
+              <div class="card mb-3">
+                <div class="card-body text-center">
+                  <h3>{{ interface.flows|length }}</h3>
+                  <p class="mb-0">Total Flows</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card mb-3">
+                <div class="card-body text-center">
+                  <h3>{{ interface.source_flows|length }}</h3>
+                  <p class="mb-0">Source Flows</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card mb-3">
+                <div class="card-body text-center">
+                  <h3>{{ interface.subflows|length }}</h3>
+                  <p class="mb-0">Subflows</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Mermaid with error handling
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: {
+      htmlLabels: true,
+      curve: 'linear'
+    }
+  });
+  
+  // Handle Mermaid errors
+  mermaid.parseError = function(err, hash) {
+    console.error('Mermaid parse error:', err);
+    document.getElementById('mermaidError').style.display = 'block';
+    document.getElementById('mermaidErrorDetails').textContent = err;
+  };
+  
+  // Force render the Mermaid diagram after initialization
+  setTimeout(function() {
+    try {
+      mermaid.init(undefined, document.querySelector('.mermaid'));
+      console.log("Mermaid diagram rendered successfully");
+    } catch (err) {
+      console.error('Error rendering mermaid diagram:', err);
+      document.getElementById('mermaidError').style.display = 'block';
+      document.getElementById('mermaidErrorDetails').textContent = err.message || 'Unknown error';
+    }
+  }, 500);
+  
+  // Mermaid-related functionality
+  let mermaidScale = 1.0;
+  document.getElementById("zoomInMermaid").addEventListener("click", function() {
+    mermaidScale *= 1.2;
+    document.querySelector('.mermaid svg').style.transform = `scale(${mermaidScale})`;
+  });
+  
+  document.getElementById("zoomOutMermaid").addEventListener("click", function() {
+    mermaidScale /= 1.2;
+    document.querySelector('.mermaid svg').style.transform = `scale(${mermaidScale})`;
+  });
+  
+  document.getElementById("resetZoomMermaid").addEventListener("click", function() {
+    mermaidScale = 1;
+    document.querySelector('.mermaid svg').style.transform = `scale(1)`;
+  });
+});
+</script>
+{% endblock %} 
